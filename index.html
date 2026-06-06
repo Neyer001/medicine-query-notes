@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中成药辨证查询笔记</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6f4e'/%3E%3Cpath d='M18 38c12-1 20-9 25-22 3 14-2 27-17 32-5 1-9-2-8-10z' fill='%23f7f3e8'/%3E%3Cpath d='M24 42c8-7 14-13 20-24' stroke='%23f7f3e8' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root{
+      --bg:#f7f3e8; --card:#fffdf7; --green:#2f6f4e; --green2:#4f8f68; --soft:#e7f1e7;
+      --text:#25322b; --muted:#6b746d; --line:#e5dccb; --warn:#b36b1e; --warnbg:#fff3df;
+      --red:#9d3d2f; --shadow:0 14px 35px rgba(47,111,78,.10);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;background:linear-gradient(180deg,#f3efe1 0%,var(--bg) 45%,#faf7ee 100%);color:var(--text);line-height:1.65}
+    a{color:var(--green)}
+    .container{max-width:1180px;margin:0 auto;padding:0 20px}
+    header{padding:48px 0 28px;background:radial-gradient(circle at 15% 10%,#dcebd6 0,transparent 34%),radial-gradient(circle at 85% 15%,#f3dfbd 0,transparent 28%)}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center}
+    h1{margin:0 0 12px;font-size:clamp(32px,5vw,56px);line-height:1.1;color:var(--green);letter-spacing:-1px}
+    .subtitle{font-size:18px;color:#47584c;margin:0 0 22px;max-width:760px}
+    .badge-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.badge{background:#fff8e8;border:1px solid #eadbbd;border-radius:999px;padding:7px 12px;color:#5a503d;font-size:13px}
+    .hero-card{background:rgba(255,253,247,.9);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px;padding:22px}.hero-card h3{margin:0 0 10px;color:var(--green)}
+    .notice{background:var(--warnbg);border:1px solid #f0c98d;color:#65400f;border-radius:18px;padding:15px 16px;margin:18px 0 0;font-size:14px}
+    .search-panel{background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:22px;margin-top:18px;position:sticky;top:0;z-index:5}
+    .searchbar{display:flex;gap:12px;align-items:center}.searchbar input{flex:1;border:2px solid #d7e6d8;border-radius:18px;padding:15px 18px;font-size:17px;outline:none;background:#fff}.searchbar input:focus{border-color:var(--green2);box-shadow:0 0 0 4px rgba(79,143,104,.12)}
+    .btn{border:0;border-radius:16px;background:var(--green);color:white;padding:14px 18px;font-size:15px;cursor:pointer}.btn.secondary{background:#e9efe5;color:var(--green);border:1px solid #ccdcca}.btn:hover{filter:brightness(.98);transform:translateY(-1px)}
+    .filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.chip{border:1px solid #d7ddcf;background:#fff;border-radius:999px;padding:8px 13px;cursor:pointer;color:#455448;font-size:14px}.chip.active{background:var(--green);color:white;border-color:var(--green)}
+    section{padding:30px 0}.section-title{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:0 0 16px}.section-title h2{margin:0;color:var(--green);font-size:28px}.count{color:var(--muted);font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 10px 25px rgba(37,50,43,.06)}.card h3{margin:8px 0 10px;font-size:20px;color:#263a2e}.meta{display:flex;gap:8px;flex-wrap:wrap}.tag{display:inline-block;background:var(--soft);color:var(--green);border-radius:999px;padding:4px 9px;font-size:12px}.tag.warn{background:var(--warnbg);color:var(--warn)}
+    .field{margin:10px 0}.field b{color:#33483b}.list{margin:6px 0 0;padding-left:18px}.warning{margin-top:12px;background:#fff7f2;border-left:4px solid #d88c5a;padding:10px 12px;border-radius:12px;color:#70421f;font-size:14px}
+    .flow{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.step{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center;position:relative}.step strong{display:block;color:var(--green);font-size:15px}.step span{font-size:13px;color:var(--muted)}
+    .map{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.map-item{background:#fffdf7;border:1px solid var(--line);border-radius:18px;padding:14px}.map-item b{color:var(--green)}.map-item p{margin:6px 0 0;color:var(--muted);font-size:13px}
+    .empty{background:#fff;border:1px dashed #d6c9ad;border-radius:20px;padding:28px;text-align:center;color:var(--muted)}
+    footer{padding:30px 0 46px;color:#6b746d;border-top:1px solid var(--line);font-size:14px}.footer-notice{background:#fef8ec;border:1px solid #eed4a7;border-radius:16px;padding:14px;margin-bottom:14px;color:#65400f}
+    .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.quick-card{background:linear-gradient(180deg,#fffdf7,#f5f1e6);border:1px solid var(--line);border-radius:18px;padding:16px;cursor:pointer}.quick-card:hover{border-color:var(--green2);box-shadow:0 8px 24px rgba(47,111,78,.12)}.quick-card b{color:var(--green)}.quick-card p{margin:6px 0 0;color:var(--muted);font-size:13px}
+    mark{background:#fff0a6;border-radius:4px;padding:0 2px}
+    @media(max-width:960px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:repeat(2,1fr)}.map{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:repeat(2,1fr)}.search-panel{position:static}}
+    @media(max-width:620px){.container{padding:0 14px}.grid,.map,.quick{grid-template-columns:1fr}.searchbar{flex-direction:column}.searchbar input,.btn{width:100%}.card{padding:16px}header{padding-top:32px}.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container hero">
+      <div>
+        <h1>中成药辨证查询笔记</h1>
+        <p class="subtitle">基于《用对就是灵丹妙药》的阅读整理：按症状、证型、药物和章节查询常见中成药辨证使用思路。</p>
+        <div class="badge-row">
+          <span class="badge">读书笔记</span><span class="badge">辨证思路</span><span class="badge">症状索引</span><span class="badge">不含剂量建议</span>
+        </div>
+        <div class="notice"><b>免责声明：</b>本网站内容仅为读书笔记和健康科普，不构成医疗建议。儿童、孕妇、老人、慢病患者、长期服药者，以及出现高热不退、呼吸困难、胸痛、意识异常、严重腹痛等情况，请及时就医。</div>
+      </div>
+      <div class="hero-card">
+        <h3>如何使用</h3>
+        <p>输入“咳嗽、黄痰、鼻炎、小柴胡、痰湿、痛经、积食”等关键词，查看相关证型、章节、药物和风险提醒。</p>
+        <p><b>核心原则：</b>不要按病名机械用药，要先看寒热、虚实、痰湿、积食和人群风险。</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="search-panel">
+      <div class="searchbar">
+        <input id="searchInput" placeholder="输入症状 / 药名 / 证型 / 章节，如：咳嗽、风寒、小柴胡、积食、痛经" />
+        <button class="btn" id="searchBtn">查询</button>
+        <button class="btn secondary" id="resetBtn">重置</button>
+      </div>
+      <div class="filters" id="filters"></div>
+    </div>
+
+    <section>
+      <div class="section-title"><h2>快捷入口</h2><span class="count">点击后自动筛选</span></div>
+      <div class="quick" id="quickLinks"></div>
+    </section>
+
+    <section>
+      <div class="section-title"><h2>查询结果</h2><span class="count" id="resultCount"></span></div>
+      <div class="grid" id="results"></div>
+      <div class="empty" id="empty" style="display:none">没有找到匹配内容。可以尝试输入更宽泛的关键词，例如“咳嗽”“热”“痰”“脾胃”“儿童”。</div>
+    </section>
+
+    <section>
+      <div class="section-title"><h2>正确用药流程</h2><span class="count">先判断边界，再考虑辨证</span></div>
+      <div class="flow">
+        <div class="step"><strong>1 判断急症</strong><span>高热不退、胸痛、喘憋先就医</span></div>
+        <div class="step"><strong>2 辨寒热</strong><span>怕冷清涕偏寒，咽痛黄痰偏热</span></div>
+        <div class="step"><strong>3 辨虚实</strong><span>久病乏力偏虚，新病胀痛偏实</span></div>
+        <div class="step"><strong>4 看痰湿积食</strong><span>苔腻、口臭、腹胀、痰多</span></div>
+        <div class="step"><strong>5 匹配章节</strong><span>感冒、咳嗽、胃肠、儿童等</span></div>
+        <div class="step"><strong>6 少而准</strong><span>避免同类药重复叠加</span></div>
+        <div class="step"><strong>7 观察反应</strong><span>加重或不清楚时及时咨询</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title"><h2>章节地图</h2><span class="count">按书的结构阅读</span></div>
+      <div class="map" id="chapterMap"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-notice"><b>再次提醒：</b>本站不提供诊断，不给出剂量，不承诺疗效。查询结果用于建立辨证阅读索引，实际用药请以医生、药师和药品说明书为准。</div>
+      <div>© 中成药辨证查询笔记｜基于个人阅读整理生成｜适合部署到 GitHub Pages / Netlify 等免费静态网站服务。</div>
+    </div>
+  </footer>
+
+<script>
+const disclaimer = "本内容仅为读书笔记和健康科普，不构成医疗建议。儿童、孕妇、老人、慢病患者、长期服药者，或出现高热不退、呼吸困难、胸痛、意识异常、严重腹痛等情况，请及时就医。";
+const medicineData = [
+{id:'ch01-001',chapter:'第一章 感冒与发热',category:'感冒发热',issue:'风寒感冒辨证笔记',symptoms:['怕冷明显','流清涕','打喷嚏','无汗或少汗','头身酸痛'],pattern:'风寒束表，肺卫不宣',relatedMedicines:['风寒感冒颗粒','感冒清热颗粒','正柴胡饮颗粒','荆防颗粒'],usageLogic:'先看寒象是否突出：怕冷、清涕、无汗、白苔更支持风寒方向。思路偏疏风散寒、解表宣肺。若咽痛黄涕明显，应重新辨为风热或寒包热。',warning:disclaimer,tags:['风寒','感冒','怕冷','清涕','第一章']},
+{id:'ch01-002',chapter:'第一章 感冒与发热',category:'感冒发热',issue:'风热感冒辨证笔记',symptoms:['发热较重','咽痛','黄涕','口渴','舌尖红'],pattern:'风热犯表，肺卫失和',relatedMedicines:['银翘散','桑菊感冒颗粒','连花清瘟','小柴胡颗粒'],usageLogic:'抓住热象：咽红咽痛、黄涕、口渴、舌红。思路偏疏风清热、利咽解表。若怕冷重、清涕多，则不宜机械按风热处理。',warning:disclaimer,tags:['风热','咽痛','黄涕','发热','第一章']},
+{id:'ch01-003',chapter:'第一章 感冒与发热',category:'感冒发热',issue:'寒包热感冒辨证笔记',symptoms:['怕冷与咽痛并见','鼻塞','身体酸痛','口干','发热'],pattern:'外寒内热或表寒里热夹杂',relatedMedicines:['九味羌活颗粒','防风通圣颗粒','升降散'],usageLogic:'寒热同时出现时，要看外表怕冷、身痛与内里口干咽痛是否并存。思路不是单纯发汗或清热，而是处理外寒内热的夹杂状态。',warning:disclaimer,tags:['寒包热','外寒内热','感冒','发热']},
+{id:'ch01-004',chapter:'第一章 感冒与发热',category:'感冒发热',issue:'胃肠型感冒辨证笔记',symptoms:['恶心','呕吐','腹泻','腹胀','发热或怕冷'],pattern:'外感夹湿，中焦不和',relatedMedicines:['藿香正气','五苓散','六一散'],usageLogic:'发热伴胃肠症状时，要看湿邪和中焦失和。思路偏化湿和中、解表。若腹痛剧烈、脱水或便血，不属于家庭自行处理范围。',warning:disclaimer,tags:['胃肠感冒','腹泻','呕吐','湿邪','藿香正气']},
+{id:'ch01-005',chapter:'第一章 感冒与发热',category:'感冒发热',issue:'感冒后迁延不愈辨证笔记',symptoms:['低热反复','乏力','咽干','咳嗽迁延','胸闷心悸'],pattern:'外感后余邪未尽，正气受损或阴津不足',relatedMedicines:['小柴胡颗粒','养阴清肺颗粒','荣心丸'],usageLogic:'感冒后期不宜只按初起外感处理。需看是否少阳不和、阴津不足或心气受扰。胸闷心悸明显时应优先医学评估。',warning:disclaimer,tags:['感冒后','迁延','低热','心悸','小柴胡']},
+{id:'ch02-001',chapter:'第二章 咳嗽',category:'咳嗽',issue:'风寒咳嗽辨证笔记',symptoms:['咳嗽声重','痰白清稀','鼻塞清涕','怕冷','舌苔薄白'],pattern:'风寒袭肺，肺气不宣',relatedMedicines:['通宣理肺','正柴胡饮颗粒','风寒感冒类中成药'],usageLogic:'以白稀痰、怕冷、清涕为判断抓手。思路偏散寒宣肺。若痰黄黏、咽痛、发热明显，应转向风热或痰热。',warning:disclaimer,tags:['咳嗽','风寒','白痰','宣肺','第二章']},
+{id:'ch02-002',chapter:'第二章 咳嗽',category:'咳嗽',issue:'痰热咳嗽辨证笔记',symptoms:['痰黄黏稠','咳嗽频繁','咽痛','口干','舌苔黄腻'],pattern:'痰热壅肺，肺失清肃',relatedMedicines:['鲜竹沥','清宣止咳颗粒','清肺化痰类中成药'],usageLogic:'观察痰色、痰质和舌苔。黄黏痰、口干咽痛更支持痰热方向。思路偏清热化痰，而非单纯止咳。',warning:disclaimer,tags:['咳嗽','痰热','黄痰','鲜竹沥']},
+{id:'ch02-003',chapter:'第二章 咳嗽',category:'咳嗽',issue:'过敏性咳嗽辨证笔记',symptoms:['咽痒即咳','夜间或晨起明显','遇冷空气加重','痰少','反复发作'],pattern:'风邪恋肺，肺气敏感或体质偏虚',relatedMedicines:['苏黄止咳胶囊','小柴胡颗粒','穴位贴'],usageLogic:'反复咽痒、阵发性咳嗽要考虑过敏体质和气道敏感。思路上不能只清热，也要看风邪、肺气和体质。',warning:disclaimer,tags:['过敏性咳嗽','咽痒','夜咳','苏黄止咳']},
+{id:'ch02-004',chapter:'第二章 咳嗽',category:'咳嗽',issue:'积食咳嗽辨证笔记',symptoms:['咳嗽伴口臭','腹胀','食欲差','大便酸臭或不畅','舌苔厚腻'],pattern:'食积生痰，胃气不降影响肺气',relatedMedicines:['保和颗粒','健胃消食类中成药'],usageLogic:'咳嗽伴明显消化线索时，要考虑从脾胃和积食入手。思路是消食导滞、和胃降逆，不能只盯着肺。',warning:disclaimer,tags:['积食','咳嗽','口臭','腹胀','保和']},
+{id:'ch02-005',chapter:'第二章 咳嗽',category:'咳嗽',issue:'咳嗽变异性哮喘辨证笔记',symptoms:['久咳不愈','运动或夜间加重','喘鸣或胸闷','遇冷加重','反复发作'],pattern:'肺气宣降失常，可能夹风、寒、痰或虚',relatedMedicines:['苏黄止咳胶囊','小青龙颗粒思路','穴位贴'],usageLogic:'长期阵发性咳嗽要注意气道问题，不宜长期自行止咳。辨证上看寒、痰、风和体质，同时建议医学评估。',warning:disclaimer,tags:['久咳','变异性哮喘','胸闷','夜咳']},
+{id:'ch03-001',chapter:'第三章 鼻炎',category:'鼻炎',issue:'过敏性鼻炎辨证笔记',symptoms:['喷嚏连连','鼻痒','清水样鼻涕','晨起明显','遇冷加重'],pattern:'肺卫不固，风邪易犯或寒饮上扰',relatedMedicines:['辛芩颗粒','玉屏风类中成药','小柴胡配五苓思路'],usageLogic:'清涕、鼻痒、遇冷加重提示偏寒或卫外不固。思路不是只通鼻，而是结合体质、肺脾和水湿。',warning:disclaimer,tags:['鼻炎','过敏','清涕','喷嚏','第三章']},
+{id:'ch03-002',chapter:'第三章 鼻炎',category:'鼻炎',issue:'鼻窦炎辨证笔记',symptoms:['黄稠鼻涕','鼻塞重','头胀头痛','鼻腔异味','口苦'],pattern:'胆热或湿热上蒸，鼻窍不利',relatedMedicines:['藿胆丸','清热通窍类中成药'],usageLogic:'黄稠涕、异味、头胀更偏热或湿热。思路偏清热化湿、通窍。若持续脓涕、发热、头痛重，应就医。',warning:disclaimer,tags:['鼻窦炎','黄涕','湿热','藿胆丸']},
+{id:'ch03-003',chapter:'第三章 鼻炎',category:'鼻炎',issue:'外虚内实型鼻炎辨证笔记',symptoms:['反复鼻塞','容易感冒','舌苔腻','乏力','清涕与黄涕交替'],pattern:'正气不足兼内有痰湿或郁热',relatedMedicines:['小柴胡颗粒','五苓散思路','辛芩颗粒'],usageLogic:'虚实夹杂时，既要看反复易感，也要看痰湿郁热。用药思路需避免只补或只清。',warning:disclaimer,tags:['鼻炎','虚实夹杂','痰湿','小柴胡','五苓']},
+{id:'ch03-004',chapter:'第三章 鼻炎',category:'鼻炎',issue:'鼻炎与脾胃关系笔记',symptoms:['鼻塞反复','腹胀','食欲差','舌苔厚腻','儿童腺样体问题'],pattern:'脾失运化，痰湿上扰鼻窍',relatedMedicines:['四君子类思路','健脾化湿类中成药','保和颗粒'],usageLogic:'鼻炎长期反复并伴脾胃弱时，要考虑痰湿来源。思路是调脾胃、化湿浊，而不是只局部喷鼻。',warning:disclaimer,tags:['鼻炎','脾胃','痰湿','腺样体']},
+{id:'ch03-005',chapter:'第三章 鼻炎',category:'鼻炎',issue:'鼻炎保健与食疗索引',symptoms:['鼻塞反复','晨起喷嚏','体质敏感','季节变化加重'],pattern:'体质调理与日常防护并重',relatedMedicines:['丝瓜食疗思路','鼻炎保健法','外治保健方法'],usageLogic:'保健法适合作为辅助，不替代治疗。重点是减少诱因、规律作息、观察冷热湿燥对症状的影响。',warning:disclaimer,tags:['鼻炎保健','食疗','体质','丝瓜']},
+{id:'ch04-001',chapter:'第四章 胃肠疾病',category:'胃肠',issue:'气滞胃胀胃痛辨证笔记',symptoms:['胃胀','嗳气','情绪后加重','胸胁不舒','疼痛走窜'],pattern:'肝胃不和，气机郁滞',relatedMedicines:['木香顺气丸','胃苏颗粒','气滞胃痛颗粒'],usageLogic:'胀比痛明显、与情绪关系大，偏气滞。思路是理气和胃，而不是一味清热或温补。',warning:disclaimer,tags:['胃胀','气滞','胃痛','木香顺气','胃苏']},
+{id:'ch04-002',chapter:'第四章 胃肠疾病',category:'胃肠',issue:'脾胃虚寒辨证笔记',symptoms:['胃部怕冷','喜热饮','空腹隐痛','大便偏溏','乏力'],pattern:'脾胃阳气不足，中焦虚寒',relatedMedicines:['香砂养胃丸','附子理中类思路','温中健脾类中成药'],usageLogic:'怕冷、喜温、便溏提示虚寒。思路偏温中健脾。若口苦口臭、苔黄腻，则不宜按虚寒处理。',warning:disclaimer,tags:['胃寒','脾虚','便溏','香砂养胃']},
+{id:'ch04-003',chapter:'第四章 胃肠疾病',category:'胃肠',issue:'胃热口臭辨证笔记',symptoms:['口臭','口苦','牙龈肿痛','便秘','舌苔黄'],pattern:'胃热或湿热内蕴',relatedMedicines:['藿香清胃片','蒲公英颗粒','清胃类中成药'],usageLogic:'口臭伴便秘、苔黄、口苦更偏胃热。思路偏清胃热、化湿浊。长期口臭也需排查口腔和胃肠疾病。',warning:disclaimer,tags:['口臭','胃热','湿热','藿香清胃']},
+{id:'ch04-004',chapter:'第四章 胃肠疾病',category:'胃肠',issue:'腹泻辨证笔记',symptoms:['大便稀','腹痛','受凉后加重','或肛门灼热','或伴恶心发热'],pattern:'可见寒湿、湿热、外感夹湿等不同方向',relatedMedicines:['藿香正气水','六一散','葛根芩连片思路'],usageLogic:'腹泻先看寒热：受凉清稀偏寒湿，臭秽灼热偏湿热，伴外感恶心偏胃肠感冒。',warning:disclaimer,tags:['腹泻','寒湿','湿热','藿香正气']},
+{id:'ch04-005',chapter:'第四章 胃肠疾病',category:'胃肠',issue:'便秘辨证笔记',symptoms:['大便干结','排便费力','口干','腹胀','或乏力无力排便'],pattern:'可见肠燥、积热、气滞或气虚',relatedMedicines:['麻仁软胶囊','润肠通便类中成药','理气类思路'],usageLogic:'便秘不能只通便。干结口渴偏燥热，腹胀嗳气偏气滞，乏力无力排便偏气虚。',warning:disclaimer,tags:['便秘','肠燥','气滞','麻仁']},
+{id:'ch04-006',chapter:'第四章 胃肠疾病',category:'胃肠',issue:'积食辨证笔记',symptoms:['腹胀','嗳腐吞酸','口臭','食欲下降','舌苔厚腻'],pattern:'饮食积滞，胃气不降',relatedMedicines:['保和颗粒','健胃消食类中成药'],usageLogic:'饮食后加重、口气酸腐、苔厚腻提示积食。思路是消食导滞、和胃降逆。',warning:disclaimer,tags:['积食','腹胀','口臭','保和']},
+{id:'ch05-001',chapter:'第五章 常见皮肤问题',category:'皮肤',issue:'痤疮湿热辨证笔记',symptoms:['面部痘痘红肿','油脂多','口苦口臭','便秘','舌苔黄腻'],pattern:'肺胃湿热或痰湿郁热上蒸',relatedMedicines:['百癣夏塔热片','调经祛斑片','清热化湿类中成药'],usageLogic:'红肿油腻、口臭便秘更偏湿热。思路偏清热化湿、调理脾胃与排便，不只是外用祛痘。',warning:disclaimer,tags:['痤疮','湿热','皮肤','第五章']},
+{id:'ch05-002',chapter:'第五章 常见皮肤问题',category:'皮肤',issue:'疮疖红肿外治笔记',symptoms:['局部红肿热痛','疮疖初起','皮肤灼热','触痛明显'],pattern:'热毒或湿热郁于肌肤',relatedMedicines:['如意金黄散','外用清热消肿类药'],usageLogic:'局部红肿热痛可参考外用清热消肿思路，但破溃、化脓、发热或糖尿病患者需谨慎。',warning:disclaimer,tags:['疮疖','红肿','外用','如意金黄散']},
+{id:'ch05-003',chapter:'第五章 常见皮肤问题',category:'皮肤',issue:'湿疹瘙痒辨证笔记',symptoms:['皮肤瘙痒','渗出或反复脱屑','遇热加重','舌苔腻','反复发作'],pattern:'风湿热或血虚风燥夹湿',relatedMedicines:['消风止痒颗粒','湿毒清胶囊','复方紫草油'],usageLogic:'湿疹要看渗出、红热、干燥脱屑的不同表现。思路可能是祛风、清热、除湿或养血润燥。',warning:disclaimer,tags:['湿疹','瘙痒','风湿热','湿毒清']},
+{id:'ch05-004',chapter:'第五章 常见皮肤问题',category:'皮肤',issue:'荨麻疹辨证笔记',symptoms:['风团反复','瘙痒明显','遇风或食物诱发','时起时消','可能伴鼻炎'],pattern:'风邪外袭，营卫不和或过敏体质',relatedMedicines:['消风止痒颗粒','抗过敏相关中成药思路'],usageLogic:'荨麻疹重点看诱因、冷热、食物和体质。思路是祛风止痒，同时关注脾胃与过敏体质。',warning:disclaimer,tags:['荨麻疹','风团','过敏','瘙痒']},
+{id:'ch05-005',chapter:'第五章 常见皮肤问题',category:'皮肤',issue:'血热型皮肤问题笔记',symptoms:['皮疹色红','瘙痒灼热','口干','大便干','舌红'],pattern:'血分有热，热扰肌肤',relatedMedicines:['凉血清热类中成药','湿毒清胶囊'],usageLogic:'皮疹鲜红、灼热、口干便干更偏血热。思路偏凉血清热，但需与湿热、过敏、感染性皮肤病区分。',warning:disclaimer,tags:['血热','皮疹','瘙痒','凉血']},
+{id:'ch06-001',chapter:'第六章 两性健康',category:'两性健康',issue:'寒凝痛经辨证笔记',symptoms:['经期腹痛喜温','怕冷','经血暗有血块','热敷缓解','手脚凉'],pattern:'寒凝胞宫，气血运行不畅',relatedMedicines:['参桂调经丸','艾附暖宫丸','温经养血合剂'],usageLogic:'痛经喜温、畏寒、血块暗色提示寒凝。思路偏温经散寒、活血调经。急性剧痛或异常出血需就医。',warning:disclaimer,tags:['痛经','宫寒','寒凝','女性']},
+{id:'ch06-002',chapter:'第六章 两性健康',category:'两性健康',issue:'气滞血瘀痛经笔记',symptoms:['经前乳胀','情绪波动','小腹胀痛','经血有块','疼痛拒按'],pattern:'肝郁气滞，血行不畅',relatedMedicines:['散结镇痛胶囊','逍遥类思路','活血调经类中成药'],usageLogic:'情绪相关、胀痛和血块是重要线索。思路偏疏肝理气、活血止痛。',warning:disclaimer,tags:['痛经','肝郁','血瘀','经前']},
+{id:'ch06-003',chapter:'第六章 两性健康',category:'两性健康',issue:'阴虚内热与更年期笔记',symptoms:['潮热盗汗','心烦失眠','口干','五心烦热','舌红少苔'],pattern:'阴虚内热，心肾不交倾向',relatedMedicines:['坤泰胶囊','滋阴清热类中成药'],usageLogic:'潮热、盗汗、舌红少苔更偏阴虚。思路不是温补，而是滋阴清热、调和心肾。',warning:disclaimer,tags:['阴虚','更年期','潮热','坤泰']},
+{id:'ch06-004',chapter:'第六章 两性健康',category:'两性健康',issue:'多囊与痰湿体质笔记',symptoms:['月经后错','体重增加','痤疮','舌苔腻','疲倦困重'],pattern:'痰湿阻滞，兼肝郁或脾虚',relatedMedicines:['调经促孕丸','健脾化湿类中成药','疏肝类思路'],usageLogic:'多囊相关问题不能只调经，也要看痰湿、脾虚、肝郁和生活方式。',warning:disclaimer,tags:['多囊','痰湿','月经','调经']},
+{id:'ch06-005',chapter:'第六章 两性健康',category:'两性健康',issue:'男性肾虚与精力下降笔记',symptoms:['腰膝酸软','疲劳','性功能下降','夜尿多','畏寒或失眠'],pattern:'肾虚可偏阳虚、阴虚或肾精不足',relatedMedicines:['还少胶囊','黄精赞育胶囊','健脑补肾丸'],usageLogic:'男科问题不宜一概补肾。怕冷夜尿偏阳虚，烦热失眠偏阴虚，长期疲劳可兼脾肾不足。',warning:disclaimer,tags:['男性','肾虚','精力','还少胶囊']},
+{id:'ch07-001',chapter:'第七章 说痰湿',category:'痰湿',issue:'痰湿体质辨证笔记',symptoms:['身体困重','痰多','舌苔厚腻','腹胀','容易疲倦'],pattern:'脾失运化，痰湿内生',relatedMedicines:['健脾化湿类中成药','橘核丸','参苓白术散思路'],usageLogic:'痰湿不是简单“湿气重”，需看苔腻、困重、痰多和脾胃运化。思路偏健脾化湿、理气化痰。',warning:disclaimer,tags:['痰湿','湿气','苔腻','第七章']},
+{id:'ch07-002',chapter:'第七章 说痰湿',category:'痰湿',issue:'湿热困阻辨证笔记',symptoms:['身重困倦','口苦','小便黄','大便黏滞','舌苔黄腻'],pattern:'湿热内蕴，气机不畅',relatedMedicines:['葛根芩连片','清热化湿类中成药'],usageLogic:'黄腻苔、口苦、尿黄、便黏更偏湿热。思路偏清热化湿，不宜单纯温燥祛湿。',warning:disclaimer,tags:['湿热','口苦','苔黄腻','葛根芩连']},
+{id:'ch07-003',chapter:'第七章 说痰湿',category:'痰湿',issue:'寒湿痹痛辨证笔记',symptoms:['关节冷痛','遇冷加重','肢体沉重','活动不利','舌苔白腻'],pattern:'寒湿阻络，经脉不通',relatedMedicines:['寒湿痹胶囊','独活寄生类中成药'],usageLogic:'关节疼痛遇冷加重、沉重感明显，偏寒湿痹阻。思路偏温经散寒、祛湿通络。',warning:disclaimer,tags:['寒湿','关节痛','痹痛','独活寄生']},
+{id:'ch07-004',chapter:'第七章 说痰湿',category:'痰湿',issue:'湿疹与湿邪关系笔记',symptoms:['皮肤瘙痒','渗出','反复潮湿','舌苔腻','遇湿热加重'],pattern:'湿邪蕴肤，可夹热或风',relatedMedicines:['湿毒清胶囊','消风止痒颗粒'],usageLogic:'湿疹若渗出、苔腻明显，可从湿邪角度理解。需区分湿热、寒湿和血虚风燥。',warning:disclaimer,tags:['湿疹','湿邪','皮肤','湿毒清']},
+{id:'ch07-005',chapter:'第七章 说痰湿',category:'痰湿',issue:'脂肪瘤与痰湿笔记',symptoms:['皮下包块','体型偏胖','苔腻','胸闷痰多','腹胀'],pattern:'痰湿凝聚，气机不畅',relatedMedicines:['橘核丸','化痰散结类思路'],usageLogic:'皮下包块类问题在中医思路中可联系痰湿、气滞、瘀阻。但包块性质必须医学评估，不可自行判断良恶性。',warning:disclaimer,tags:['脂肪瘤','痰湿','包块','散结']},
+{id:'ch08-001',chapter:'第八章 慢病',category:'慢病',issue:'失眠心神不安笔记',symptoms:['入睡难','心烦','心悸','多梦','口干'],pattern:'心阴不足、心火扰神或心肾不交',relatedMedicines:['天王补心丸','朱砂安神丸思路'],usageLogic:'失眠要看虚烦、心悸、口干、梦多等线索。思路可能是养阴安神或清心安神，不宜长期自行依赖。',warning:disclaimer,tags:['失眠','心神','天王补心','慢病']},
+{id:'ch08-002',chapter:'第八章 慢病',category:'慢病',issue:'肝郁胃痛笔记',symptoms:['胃痛胃胀','情绪后加重','胸胁胀','嗳气','口苦'],pattern:'肝郁气滞，横逆犯胃',relatedMedicines:['逍遥丸','气滞胃痛颗粒','舒肝健胃丸'],usageLogic:'慢性胃痛伴情绪因素，要从肝胃不和考虑。思路是疏肝理气、和胃止痛。',warning:disclaimer,tags:['肝郁','胃痛','逍遥丸','气滞']},
+{id:'ch08-003',chapter:'第八章 慢病',category:'慢病',issue:'结节瘀阻笔记',symptoms:['体检发现结节','情绪郁结','胸胁不舒','经前胀痛','舌暗'],pattern:'气滞血瘀或痰瘀互结',relatedMedicines:['桂枝茯苓丸','化痰散结类中成药'],usageLogic:'结节类问题必须定期医学随访。中医思路多从气滞、痰湿、血瘀理解，不能替代影像和病理判断。',warning:disclaimer,tags:['结节','血瘀','痰瘀','桂枝茯苓']},
+{id:'ch08-004',chapter:'第八章 慢病',category:'慢病',issue:'痛风湿热笔记',symptoms:['关节红肿热痛','尿酸高','口渴','小便黄','舌苔黄腻'],pattern:'湿热痹阻，经络不通',relatedMedicines:['痛风定胶囊','清热利湿通络类中成药'],usageLogic:'痛风急性红肿热痛多偏湿热。思路偏清热利湿、通络止痛，但尿酸管理和急性期处理需遵医嘱。',warning:disclaimer,tags:['痛风','湿热','关节红肿','尿酸']},
+{id:'ch08-005',chapter:'第八章 慢病',category:'慢病',issue:'消瘦脾虚笔记',symptoms:['消瘦','食欲差','大便溏','乏力','面色少华'],pattern:'脾气不足，运化吸收偏弱',relatedMedicines:['参苓白术散','健脾益气类中成药'],usageLogic:'长期消瘦先排查基础疾病。若伴食少便溏乏力，可从脾虚运化差理解，思路偏健脾益气。',warning:disclaimer,tags:['消瘦','脾虚','参苓白术','慢病']},
+{id:'ch09-001',chapter:'第九章 小儿综合',category:'小儿综合',issue:'小儿外感发热笔记',symptoms:['发热','咽红或鼻塞','食欲下降','精神状态变化','可能夹积食'],pattern:'外感风寒/风热或外感夹滞',relatedMedicines:['小儿珠珀散','小儿柴桂退热颗粒','小儿豉翘'],usageLogic:'儿童发热要看精神状态、咽部、鼻涕、舌苔和积食线索。不要只以体温决定用药方向。',warning:disclaimer,tags:['小儿','发热','外感','小儿柴桂']},
+{id:'ch09-002',chapter:'第九章 小儿综合',category:'小儿综合',issue:'小儿咳喘笔记',symptoms:['咳嗽','喘促','痰声重','发热或鼻塞','夜间加重'],pattern:'肺气宣降不利，可夹痰热、风寒或积食',relatedMedicines:['小儿麻甘颗粒','清肺化痰类中成药','咳嗽穴位贴'],usageLogic:'儿童咳喘要特别重视呼吸状态。辨证上看痰色、寒热、是否积食，不能多种止咳药叠加。',warning:disclaimer,tags:['小儿','咳喘','痰','麻甘']},
+{id:'ch09-003',chapter:'第九章 小儿综合',category:'小儿综合',issue:'小儿积食发热笔记',symptoms:['口臭','腹胀','大便酸臭','睡不安','发热'],pattern:'食积内停，郁而化热',relatedMedicines:['消食退热糖浆','保和颗粒','小儿豉翘'],usageLogic:'发热伴口臭、苔厚、腹胀、大便异常时，可考虑外感夹滞或积食化热。',warning:disclaimer,tags:['小儿','积食','发热','口臭']},
+{id:'ch09-004',chapter:'第九章 小儿综合',category:'小儿综合',issue:'小儿脾胃弱笔记',symptoms:['食欲差','大便溏','面色少华','容易疲倦','反复积食'],pattern:'脾胃运化不足',relatedMedicines:['资生丸','参苓白术类思路','健脾类中成药'],usageLogic:'长期食少和短期积食要区分。脾虚偏慢性调理，积食偏消导，不宜长期反复消食。',warning:disclaimer,tags:['小儿','脾胃','食少','资生丸']},
+{id:'ch09-005',chapter:'第九章 小儿综合',category:'小儿综合',issue:'儿童腺样体与痰湿笔记',symptoms:['打呼噜','张口呼吸','鼻塞反复','积食','痰多'],pattern:'痰湿上阻鼻咽，兼外感反复',relatedMedicines:['葛根汤颗粒思路','保和颗粒','健脾化痰类思路'],usageLogic:'腺样体问题需耳鼻喉评估。中医阅读思路常关注积食、痰湿和反复外感。',warning:disclaimer,tags:['腺样体','小儿','鼻塞','痰湿']},
+{id:'ch10-001',chapter:'第十章 杂谈',category:'杂谈',issue:'水饮咳喘笔记',symptoms:['清稀痰多','遇冷加重','胸闷','鼻流清涕','舌苔白滑'],pattern:'水饮内停，上犯于肺',relatedMedicines:['小青龙颗粒','温化寒饮类中成药'],usageLogic:'清稀痰多、遇冷加重和白滑苔提示寒饮。思路偏温肺化饮，而不是单纯清热止咳。',warning:disclaimer,tags:['水饮','小青龙','清痰','杂谈']},
+{id:'ch10-002',chapter:'第十章 杂谈',category:'杂谈',issue:'藿香正气扩展用法笔记',symptoms:['恶心','腹胀','头昏困重','暑湿环境后不适','腹泻'],pattern:'暑湿或寒湿困中，中焦气机不畅',relatedMedicines:['藿香正气'],usageLogic:'藿香正气不只是“中暑药”，关键看湿邪困中、恶心腹胀、头重困倦等线索。',warning:disclaimer,tags:['藿香正气','湿邪','腹胀','杂谈']},
+{id:'ch10-003',chapter:'第十章 杂谈',category:'杂谈',issue:'焦虑心神不安笔记',symptoms:['焦虑','心烦','失眠','心悸','坐立不安'],pattern:'心神不宁，可夹肝郁、阴虚或心火',relatedMedicines:['朱砂安神丸','天王补心丸思路'],usageLogic:'焦虑失眠需区分心火、阴虚、肝郁。严重焦虑、惊恐发作或抑郁风险应寻求专业帮助。',warning:disclaimer,tags:['焦虑','失眠','安神','杂谈']},
+{id:'ch10-004',chapter:'第十章 杂谈',category:'杂谈',issue:'附子理中外用思路笔记',symptoms:['腹部怕冷','受凉腹痛','便溏','儿童或成人脾胃虚寒倾向'],pattern:'中焦虚寒，阳气不足',relatedMedicines:['附子理中丸外用思路','温中散寒类中成药'],usageLogic:'外用法属于辅助思路，重点仍是辨寒象。皮肤破损、过敏体质、儿童使用均需谨慎。',warning:disclaimer,tags:['附子理中','外用','虚寒','腹痛']},
+{id:'ch10-005',chapter:'第十章 杂谈',category:'杂谈',issue:'联合用药风险笔记',symptoms:['同时吃多种感冒药','止咳药叠加','清热与温散并用','症状越吃越乱'],pattern:'治法混乱或成分重复风险',relatedMedicines:['感冒类中成药','止咳化痰类中成药','清热解毒类中成药'],usageLogic:'读书笔记的核心是“少而准”。用药前先确认寒热方向和是否重复，不建议自行叠加多种中成药。',warning:disclaimer,tags:['联合用药','重复用药','安全','杂谈']}
+];
+const categories = ['全部','感冒发热','咳嗽','鼻炎','胃肠','皮肤','两性健康','痰湿','慢病','小儿综合','杂谈'];
+const quickInfo = [
+ ['感冒发热','风寒、风热、寒包热、胃肠感冒'],['咳嗽','白痰、黄痰、过敏、积食咳嗽'],['鼻炎','清涕、黄涕、鼻窦炎、腺样体'],['胃肠','胃胀、胃痛、腹泻、便秘、积食'],['皮肤','痤疮、湿疹、荨麻疹、血热'],['两性健康','痛经、宫寒、阴虚、男性肾虚'],['痰湿','湿气、困重、关节痛、脂肪瘤'],['小儿综合','发热、咳喘、积食、脾胃弱']
+];
+const chapters = [
+ ['第一章 感冒与发热','风寒、风热、寒包热、流感、胃肠感冒'],['第二章 咳嗽','外感咳嗽、痰咳、过敏咳、积食咳'],['第三章 鼻炎','鼻炎、鼻窦炎、外虚内实、保健'],['第四章 胃肠疾病','胃胀、胃痛、腹泻、便秘、口臭、积食'],['第五章 常见皮肤问题','痤疮、疮疖、湿疹、荨麻疹'],['第六章 两性健康','痛经、宫寒、多囊、男科、肾虚'],['第七章 说痰湿','湿气、痰湿体质、痹痛、脂肪瘤'],['第八章 慢病','失眠、结节、痛风、肝郁、消瘦'],['第九章 小儿综合','小儿发热、咳喘、积食、腺样体'],['第十章 杂谈','水饮、焦虑、藿香正气、外用法、安全边界']
+];
+let activeCategory='全部'; let keyword='';
+const el = id => document.getElementById(id);
+function init(){
+  el('filters').innerHTML = categories.map(c=>`<button class="chip ${c==='全部'?'active':''}" data-cat="${c}">${c}</button>`).join('');
+  el('quickLinks').innerHTML = quickInfo.map(([c,d])=>`<div class="quick-card" data-cat="${c}"><b>${c}</b><p>${d}</p></div>`).join('');
+  el('chapterMap').innerHTML = chapters.map(([c,d])=>`<div class="map-item"><b>${c}</b><p>${d}</p></div>`).join('');
+  document.querySelectorAll('[data-cat]').forEach(node=>node.addEventListener('click',()=>{ activeCategory=node.dataset.cat; updateActive(); render(); window.scrollTo({top:document.querySelector('.search-panel').offsetTop-10,behavior:'smooth'}); }));
+  el('searchBtn').addEventListener('click',()=>{keyword=el('searchInput').value.trim();render();});
+  el('resetBtn').addEventListener('click',()=>{keyword='';activeCategory='全部';el('searchInput').value='';updateActive();render();});
+  el('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){keyword=e.target.value.trim();render();}});
+  el('searchInput').addEventListener('input',e=>{keyword=e.target.value.trim();render();});
+  render();
+}
+function updateActive(){document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat===activeCategory));}
+function matchItem(item){
+  const catOk = activeCategory==='全部' || item.category===activeCategory;
+  if(!catOk) return false;
+  if(!keyword) return true;
+  const k=keyword.toLowerCase();
+  const blob=[item.chapter,item.category,item.issue,item.pattern,item.usageLogic,...item.symptoms,...item.relatedMedicines,...item.tags].join(' ').toLowerCase();
+  return blob.includes(k);
+}
+function hi(text){ if(!keyword) return text; const safe=keyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); return String(text).replace(new RegExp(safe,'gi'),m=>`<mark>${m}</mark>`); }
+function render(){
+  const data=medicineData.filter(matchItem);
+  el('resultCount').textContent=`共 ${data.length} 条 / 全站 ${medicineData.length} 条`;
+  el('empty').style.display=data.length?'none':'block';
+  el('results').innerHTML=data.map(item=>`<article class="card">
+    <div class="meta"><span class="tag">${hi(item.category)}</span><span class="tag warn">${hi(item.chapter)}</span></div>
+    <h3>${hi(item.issue)}</h3>
+    <div class="field"><b>可能证型：</b>${hi(item.pattern)}</div>
+    <div class="field"><b>典型症状：</b><ul class="list">${item.symptoms.map(s=>`<li>${hi(s)}</li>`).join('')}</ul></div>
+    <div class="field"><b>相关药物/方法：</b>${item.relatedMedicines.map(m=>`<span class="tag">${hi(m)}</span>`).join(' ')}</div>
+    <div class="field"><b>用药思路：</b>${hi(item.usageLogic)}</div>
+    <div class="warning"><b>风险提醒：</b>${item.warning}</div>
+    <div class="meta" style="margin-top:12px">${item.tags.slice(0,6).map(t=>`<span class="tag">#${hi(t)}</span>`).join('')}</div>
+  </article>`).join('');
+}
+init();
+</script>
+</body>
+</html>
